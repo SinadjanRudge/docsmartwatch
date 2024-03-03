@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1071647212263",
+    "project_id": "doctrack-de0a8",
+    "storage_bucket": "doctrack-de0a8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071647212263:android:4441c83df21d6ea9e29842",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-1RAtVozzrQWl7yZKDOCbLNItK-wSV30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071647212263:android:984ec3159d68e796e29842",
+        "android_client_info": {
+          "package_name": "com.triadss.doctrack2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-1RAtVozzrQWl7yZKDOCbLNItK-wSV30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

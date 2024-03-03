@@ -12,15 +12,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
-<!--        <activity-->
-<!--            android:name=".HomePageActivity"-->
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
+        <activity
+            android:name=".Home_Medication"
+            android:exported="false" />
+        <activity
+            android:name=".Home_VitalMonitor"
+            android:exported="false" />
+        <activity
+            android:name=".Home_Appointment"
+            android:exported="false" />
+        <activity
+            android:name=".Home_Selection"
+            android:exported="false" /> <!-- <activity -->
+        <!-- android:name=".HomePageActivity" -->
+        <!-- android:exported="true"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
         <activity
             android:name=".DoctorChecker"
             android:exported="true">
