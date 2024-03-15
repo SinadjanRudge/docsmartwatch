@@ -5,7 +5,10 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.health.services.client.ExerciseClient
@@ -29,135 +32,64 @@ import androidx.health.services.client.getCapabilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Home_VitalMonitor : AppCompatActivity() {
     private val PERMISSION_REQUEST_CODE = 1001;
-    private lateinit var measureClient: MeasureClient
     private lateinit var exerciseClient: ExerciseClient
-    private lateinit var heartRateCallback: MeasureCallback
     private lateinit var exerciseCallback: ExerciseUpdateCallback
+    private lateinit var loadingText: TextView
+    private lateinit var heartRateText: TextView
+    private lateinit var unavailabileHeartRate: TextView
+
+    private lateinit var vitalsContainer: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_vital_monitor)
 
         val exit: Button = findViewById(R.id.exitBtn);
+        loadingText = findViewById(R.id.loadingText)
+        unavailabileHeartRate = findViewById(R.id.unavailabileHeartRateText)
+        vitalsContainer = findViewById(R.id.vitalsContainer)
+        heartRateText = findViewById(R.id.heartRateValue)
 
-        exit.setOnClickListener {                                                //Appointment
+        exit.setOnClickListener {
             startActivity(Intent(this@Home_VitalMonitor, Home_Selection::class.java))
         };
 
         val healthClient = HealthServices.getClient(this)
-        measureClient = healthClient.measureClient
+        val measureClient = healthClient.measureClient
         exerciseClient = healthClient.exerciseClient
-        val pmonClient: PassiveMonitoringClient = healthClient.passiveMonitoringClient
 
-        getMeasureCapabilities(measureClient, ::onMeasure);
-        getExerciseCapabilities(exerciseClient, ::onExercise);
-        getPMonCapabilities(pmonClient, ::onPmon);
+        initHeartRate(measureClient)
 
 //        checkHeartRateAvailable()
 //        setUpCallBacks()
-
     }
 
-    fun onMeasure(m: MeasureCapabilities)
+
+    private fun initHeartRate(measureClient: MeasureClient)
     {
-        System.out.println();
+        supportsHeartRate(measureClient, object:  EitherCallback {
+            override fun onTrue() {
+                // Handle successful result
+                loadingText.visibility = View.GONE
+                vitalsContainer.visibility = View.VISIBLE
+                initMeasureClientCallbacks(measureClient)
+            }
+
+            override fun onFalse() {
+                // Handle error
+                loadingText.visibility = View.GONE
+                unavailabileHeartRate.visibility = View.VISIBLE
+            }
+        });
     }
 
-    fun onExercise(e: ExerciseCapabilities)
+    private fun initMeasureClientCallbacks(measureClient: MeasureClient)
     {
-        System.out.println();
-    }
-
-    fun onPmon(e: PassiveMonitoringCapabilities)
-    {
-        System.out.println();
-    }
-
-    fun checkWatchPermission(): Boolean {
-        val activityRecognitionPermission = android.Manifest.permission.ACTIVITY_RECOGNITION
-        val bodySensorsPermission = android.Manifest.permission.BODY_SENSORS
-
-        val activityRecognitionGranted = ContextCompat.checkSelfPermission(
-            this,
-            activityRecognitionPermission
-        ) == PackageManager.PERMISSION_GRANTED
-
-        val bodySensorsGranted = ContextCompat.checkSelfPermission(
-            this,
-            bodySensorsPermission
-        ) == PackageManager.PERMISSION_GRANTED
-
-        val permissionsToRequest = mutableListOf<String>()
-        if (!activityRecognitionGranted) {
-            permissionsToRequest.add(activityRecognitionPermission)
-        }
-        if (!bodySensorsGranted) {
-            permissionsToRequest.add(bodySensorsPermission)
-        }
-
-        if (permissionsToRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionsToRequest.toTypedArray(),
-                PERMISSION_REQUEST_CODE
-            )
-            return false
-        }
-
-        return true
-    }
-
-    private fun getMeasureCapabilities(measureClient: MeasureClient, callback: (capabilities: MeasureCapabilities) -> Unit)
-    {
-        CoroutineScope(Dispatchers.IO).launch {
-            val measureCapabilities = measureClient.getCapabilities()
-            callback(measureCapabilities)
-        }
-    }
-
-    private fun getExerciseCapabilities(exerciseClient: ExerciseClient, callback: (capabilities: ExerciseCapabilities) -> Unit)
-    {
-        CoroutineScope(Dispatchers.IO).launch {
-            val exerciseCapabilities = exerciseClient.getCapabilities()
-            callback(exerciseCapabilities)
-        }
-    }
-
-    private fun getPMonCapabilities(pmonClient: PassiveMonitoringClient, callback: (capabilities: PassiveMonitoringCapabilities) -> Unit)
-    {
-        CoroutineScope(Dispatchers.IO).launch {
-            val pmonCapabilities = pmonClient.getCapabilities()
-            callback(pmonCapabilities)
-        }
-    }
-
-    private fun checkHeartRateAvailable() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val measureCapabilities = measureClient.getCapabilities()
-            val exerciseCapabilities = exerciseClient.getCapabilities()
-            val supportsHeartRate =
-                DataType.HEART_RATE_BPM in measureCapabilities.supportedDataTypesMeasure
-            //"Heart rate supported: $supportsHeartRate".log()
-            //"Exercise supported: $exerciseCapabilities".log()
-            //"Measure supported: $measureCapabilities".log()
-            System.out.println();
-        }
-    }
-
-    private fun registerHeartRate() {
-        if (checkWatchPermission()) {
-            measureClient.registerMeasureCallback(
-                DataType.Companion.HEART_RATE_BPM,
-                heartRateCallback
-            )
-        }
-    }
-
-    private fun setUpCallBacks() {
-        heartRateCallback = object : MeasureCallback {
+        val heartRateCallback = object : MeasureCallback {
             override fun onAvailabilityChanged(
                 dataType: DeltaDataType<*, *>,
                 availability: Availability
@@ -173,6 +105,8 @@ class Home_VitalMonitor : AppCompatActivity() {
                 // Inspect data points.
                 try {
                     "Heart rate data received: ${data.sampleDataPoints[0].value}".log()
+                    val value = data.sampleDataPoints[0].value
+                    heartRateText.text = value.toString()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -190,51 +124,28 @@ class Home_VitalMonitor : AppCompatActivity() {
             }
         }
 
-        exerciseCallback = object : ExerciseUpdateCallback {
-            override fun onExerciseUpdateReceived(update: ExerciseUpdate) {
-                val exerciseStateInfo = update.exerciseStateInfo
-                val activeDuration = update.activeDurationCheckpoint
-                val latestMetrics = update.latestMetrics
-                val latestGoals = update.latestAchievedGoals
-                "Exercise update received: $update".log()
-                "Exercise update received: $exerciseStateInfo".log()
-                "Exercise update received: $activeDuration".log()
-                "Exercise update received: $latestMetrics".log()
-            }
+        measureClient.registerMeasureCallback(
+                DataType.Companion.HEART_RATE_BPM,
+                heartRateCallback
+            )
+    }
 
-            override fun onLapSummaryReceived(lapSummary: ExerciseLapSummary) {
-                "Lap summary received: $lapSummary".log()
-                // For ExerciseTypes that support laps, this is called when a lap is marked.
-            }
 
-            override fun onRegistered() {
-                "Exercise update callback registered".log()
-                //val exerciseTypes = exerciseClient.getCapabilities().supportedExerciseTypes
-            }
-
-            override fun onRegistrationFailed(throwable: Throwable) {
-                throwable.printStackTrace()
-                "Exercise update callback registration failed: $throwable".log()
-            }
-
-            override fun onAvailabilityChanged(
-                dataType: DataType<*, *>,
-                availability: Availability
-            ) {
-                "Availability changed: $availability".log()
-                // Called when the availability of a particular DataType changes.
-                when {
-                    availability is LocationAvailability -> {}
-                    // Relates to Location / GPS
-                    availability is DataTypeAvailability -> {}
-                    // Relates to another DataType
+    private fun supportsHeartRate(measureClient: MeasureClient, eitherCallback : EitherCallback) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val measureCapabilities = measureClient.getCapabilities()
+            withContext(Dispatchers.Main) {
+                when(DataType.HEART_RATE_BPM in measureCapabilities.supportedDataTypesMeasure) {
+                    true -> eitherCallback.onTrue()
+                    false -> eitherCallback.onFalse()
                 }
             }
         }
+    }
 
-        if (checkWatchPermission()) {
-            registerHeartRate()
-        }
+    interface EitherCallback {
+        fun onTrue()
+        fun onFalse()
     }
 
     companion object {
