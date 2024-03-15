@@ -64,8 +64,6 @@ class Home_VitalMonitor : AppCompatActivity() {
 
         initHeartRate(measureClient)
 
-//        checkHeartRateAvailable()
-//        setUpCallBacks()
     }
 
 
