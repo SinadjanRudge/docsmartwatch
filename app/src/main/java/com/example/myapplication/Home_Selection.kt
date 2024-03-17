@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.TextView
 
 class Home_Selection : AppCompatActivity() {
 
@@ -13,15 +12,15 @@ class Home_Selection : AppCompatActivity() {
         setContentView(R.layout.activity_home_selection)
 
         val close = findViewById(R.id.btn_close) as Button
-        val appointment = findViewById(R.id.btn_appointment) as Button
+        val syncing = findViewById(R.id.btn_syncing) as Button
         val vitalMonitor = findViewById(R.id.vitalMonitor) as Button
 
         close.setOnClickListener {                                                      //Close App
             finishAffinity()
         }
-        appointment.setOnClickListener {                                                //Appointment
-            appointment.setOnClickListener {
-                Appointment()
+        syncing.setOnClickListener {                                                //Appointment
+            syncing.setOnClickListener {
+                Syncing()
             }
         }
 
@@ -30,8 +29,8 @@ class Home_Selection : AppCompatActivity() {
         }
     }
 
-    fun Appointment(){
-        startActivity(Intent(this@Home_Selection, Home_Appointment::class.java))
+    fun Syncing(){
+        startActivity(Intent(this@Home_Selection, Home_Syncing::class.java))
     }
 
     fun VitalMonitor(){

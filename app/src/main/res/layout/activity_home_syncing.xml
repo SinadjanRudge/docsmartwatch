@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView3"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:contentDescription="scroll"
+    android:fillViewport="true"
+    android:padding="50dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/findPhoneBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Find Phone" />
+
+            <Button
+                android:id="@+id/stopBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stop"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Find Phone"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:background="#000000"-->
+    <!--        android:id="@+id/Constraintlayout1"-->
+    <!--        tools:context=".Home_Appointment">-->
+
+    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+</RelativeLayout>
