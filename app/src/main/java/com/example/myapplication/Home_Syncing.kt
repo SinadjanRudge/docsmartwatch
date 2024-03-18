@@ -87,10 +87,12 @@ class Home_Syncing : AppCompatActivity() {
         }
 
         findPhoneBtn.setOnClickListener {
+            Log.e("Home Syncing", "Device Bluetooth Name: " + getBluetoothDeviceName());
             makeDiscoverable()
             stopBtn.visibility = VISIBLE
             findPhoneBtn.visibility = GONE
             btServerThread = BluetoothServerThread()
+//            Toast.makeText(context, "Searching for device pair...", Toast.LENGTH_SHORT).show()
             btServerThread.start()
         }
     }
@@ -134,7 +136,8 @@ class Home_Syncing : AppCompatActivity() {
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
         startActivityForResult(discoverableIntent, requestCode)
         // This line will show a dialog asking the user to make the device visible for 300 seconds
-        showDialog("Make visible to other Bluetooth devices for 300 seconds?")
+//        showDialog("Make visible to other Bluetooth devices for 300 seconds?")
+
     }
 
     private fun showDialog(message: String) {
@@ -146,6 +149,8 @@ class Home_Syncing : AppCompatActivity() {
                     this, arrayOf(Manifest.permission.BLUETOOTH_ADVERTISE),
                     REQUEST_ADVERTISE_BT
                 )
+                // Show a message indicating that the device is searching for its pair
+                Toast.makeText(context, "Searching for device pair...", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("No") { dialog, _ ->
                 // User clicked No, cancel the operation
@@ -153,6 +158,12 @@ class Home_Syncing : AppCompatActivity() {
             }
         builder.create().show()
     }
+
+    @SuppressLint("MissingPermission")
+    private fun getBluetoothDeviceName(): String? {
+        return bluetoothAdapter.name
+    }
+
 
     @SuppressLint("MissingPermission")
     private inner class BluetoothServerThread : Thread() {
@@ -169,6 +180,7 @@ class Home_Syncing : AppCompatActivity() {
 
         override fun run() {
             var connected = false
+
             while (shouldLoop && !connected) {
                 val socket: BluetoothSocket? = try {
                     mmServerSocket?.accept()
@@ -195,11 +207,12 @@ class Home_Syncing : AppCompatActivity() {
 
         // Closes the connect socket and causes the thread to finish.
         fun cancel() {
-            try {
-                mmServerSocket?.close()
-            } catch (e: IOException) {
-                Log.e(TAG, "Could not close the connect socket", e)
-            }
+            shouldLoop = false
+//            try {
+//                mmServerSocket?.close()
+//            } catch (e: IOException) {
+//                Log.e(TAG, "Could not close the connect socket", e)
+//            }
         }
     }
 
