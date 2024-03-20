@@ -23,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
+
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />
