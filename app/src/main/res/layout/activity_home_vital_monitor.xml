@@ -90,108 +90,136 @@
             android:stretchColumns="1">
 
             <TableRow>
+
                 <TextView
                     android:padding="3dip"
-                    android:text="Blood Pressure" />
+                    android:text="Blood Pressure"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="0/0" />
+                    android:text="0/0"
+                    android:textColor="#E4E3E3" />
+
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="mm Hg" />
+                    android:text="mm Hg"
+                    android:textColor="#E4E3E3" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:padding="3dip"
-                    android:text="Temperature" />
+                    android:text="Temperature"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="0" />
+                    android:text="0"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="&#176;C" />
+                    android:text="&#176;C"
+                    android:textColor="#E4E3E3" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:padding="3dip"
-                    android:text="Pulse Rate" />
+                    android:text="Pulse Rate"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="0" />
+                    android:text="0"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="bpm" />
+                    android:text="bpm"
+                    android:textColor="#E4E3E3" />
             </TableRow>
             <TableRow>
+
                 <TextView
                     android:padding="3dip"
-                    android:text="Oxygen Level" />
+                    android:text="Oxygen Level"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="0" />
+                    android:text="0"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="mm Hg" />
-            </TableRow>
-
-            <TableRow>
-                <TextView
-                    android:padding="3dip"
-                    android:text="Weight" />
-
-                <TextView
-                    android:gravity="right"
-                    android:padding="3dip"
-                    android:text="0" />
-
-                <TextView
-                    android:gravity="right"
-                    android:padding="3dip"
-                    android:text="kg" />
+                    android:text="mm Hg"
+                    android:textColor="#E4E3E3" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:padding="3dip"
-                    android:text="Height" />
+                    android:text="Weight"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="0" />
+                    android:text="0"
+                    android:textColor="#E4E3E3" />
 
-                 <TextView
+                <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="cm" />
+                    android:text="kg"
+                    android:textColor="#E4E3E3" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:padding="3dip"
-                    android:text="BMI" />
+                    android:text="Height"
+                    android:textColor="#E4E3E3" />
 
                 <TextView
                     android:gravity="right"
                     android:padding="3dip"
-                    android:text="0" />
+                    android:text="0"
+                    android:textColor="#E4E3E3" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="cm"
+                    android:textColor="#E4E3E3" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:padding="3dip"
+                    android:text="BMI"
+                    android:textColor="#EDEDED" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0"
+                    android:textColor="#EDEDED" />
             </TableRow>
         </TableLayout>
 
