@@ -83,6 +83,118 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:stretchColumns="1">
+
+            <TableRow>
+                <TextView
+                    android:padding="3dip"
+                    android:text="Blood Pressure" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0/0" />
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="mm Hg" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:padding="3dip"
+                    android:text="Temperature" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="&#176;C" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:padding="3dip"
+                    android:text="Pulse Rate" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="bpm" />
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:padding="3dip"
+                    android:text="Oxygen Level" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="mm Hg" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:padding="3dip"
+                    android:text="Weight" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="kg" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:padding="3dip"
+                    android:text="Height" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0" />
+
+                 <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="cm" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:padding="3dip"
+                    android:text="BMI" />
+
+                <TextView
+                    android:gravity="right"
+                    android:padding="3dip"
+                    android:text="0" />
+            </TableRow>
+        </TableLayout>
+
         <Button
             android:id="@+id/exitBtn"
             android:layout_width="match_parent"
