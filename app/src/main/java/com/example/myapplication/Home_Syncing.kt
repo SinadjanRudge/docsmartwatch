@@ -1,79 +1,99 @@
 package com.example.myapplication
 
+import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.Button
-import android.widget.Toast
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.google.android.gms.wearable.MessageClient
-import com.google.android.gms.wearable.MessageEvent
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.myapplication.constants.BluetoothConstants
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.Wearable
-import java.nio.charset.StandardCharsets
+import java.util.concurrent.ExecutionException
 
-class Home_Syncing : AppCompatActivity(), MessageClient.OnMessageReceivedListener {
-    private lateinit var messageClient: MessageClient
-    private lateinit var sendMessageButton: Button
+
+class Home_Syncing : AppCompatActivity() {
+    private lateinit var talkClick: Button
+    private lateinit var textLog: TextView
+    private lateinit var activity: Activity
+
     private var phoneNodeId: String? = null // Initialize as nullable
+    private var sentMessageNumber = 1;
+    private var receivedMessageNumber = 1;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_syncing)
 
-        messageClient = Wearable.getMessageClient(this)
-        messageClient.addListener(this)
+        activity = this
 
-        sendMessageButton = findViewById(R.id.send_message)
-        sendMessageButton.setOnClickListener {
-            val message = "Hello from Wear OS!"
-            // Check if phoneNodeId is available before sending the message
-            if (phoneNodeId != null) {
+        talkClick = findViewById(R.id.talkClick);
+        textLog = findViewById(R.id.textLog);
 
-                sendWearableMessage(phoneNodeId!!, "/action_turn_on", message.toByteArray(StandardCharsets.UTF_8))
-                Log.e("Home Syncing", "Sending message")
-            } else {
-                Toast.makeText(this@Home_Syncing, "Phone node ID not available", Toast.LENGTH_SHORT).show()
+        //Create an OnClickListener//
+        //Create an OnClickListener//
+        talkClick.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val onClickMessage = "I just sent the handheld a message " + sentMessageNumber++
+                textLog.setText(onClickMessage)
+                //Use the same path//
+                val datapath = BluetoothConstants.DataPath
+                SendMessage(datapath, onClickMessage).start()
             }
-        }
-
-        // Connect to Google API Client to get connected nodes
-        Wearable.getNodeClient(this).connectedNodes.addOnSuccessListener { nodes ->
-            // Iterate through connected nodes and get the phoneNodeId
-            for (node in nodes) {
-                if (node.isNearby) {
-                    phoneNodeId = node.id
-                    break
-                }
-            }
-        }
-
-        // Call logNearbyNodes to log nearby nodes
-        logNearbyNodes()
+        })
+        //Register to receive local broadcasts, which we'll be creating in the next step//
+        val newFilter = IntentFilter(Intent.ACTION_SEND)
+        val messageReceiver = Receiver()
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, newFilter)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        messageClient.removeListener(this)
     }
 
-    override fun onMessageReceived(messageEvent: MessageEvent) {
-        val message = String(messageEvent.data, StandardCharsets.UTF_8)
-        // Handle received message based on your application's logic
-        // For example, update UI or trigger actions
-        Toast.makeText(this@Home_Syncing, "Received Message: $message", Toast.LENGTH_SHORT).show()
+    inner class Receiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            //Display the following when a new message is received//
+            val onMessageReceived =
+                "\nI just received a message from the handheld: " + receivedMessageNumber++ +
+                "\n" + intent?.getStringExtra(BluetoothConstants.MessageKey);
+            textLog.append(onMessageReceived)
+        }
     }
 
-    private fun sendWearableMessage(nodeId: String, messagePath: String, message: ByteArray) {
-        messageClient.sendMessage(nodeId, messagePath, message)
-    }
-
-    private fun logNearbyNodes() {
-        Wearable.getNodeClient(this).connectedNodes.addOnSuccessListener { nodes ->
-            for (node in nodes) {
-                Log.e(
-                    "Nearby Node",
-                    "Node ID: " + node.id + ", Display Name: " + node.displayName
-                )
+    internal inner class SendMessage //Constructor for sending information to the Data Layer//
+        (var path: String, var message: String) : Thread() {
+        override fun run() {
+            //Retrieve the connected devices//
+            val nodeListTask: Task<List<Node>> =
+                Wearable.getNodeClient(activity).getConnectedNodes()
+            try {
+                //Block on a task and get the result synchronously//
+                val nodes: List<Node> = Tasks.await<List<Node>>(nodeListTask)
+                for (node in nodes) {
+                    //Send the message///
+                    val sendMessageTask: Task<Int> = Wearable.getMessageClient(this@Home_Syncing)
+                        .sendMessage(node.getId(), path, message.toByteArray())
+                    try {
+                        val result = Tasks.await(sendMessageTask)
+                        //Handle the errors//
+                    } catch (exception: ExecutionException) {
+                        //TO DO//
+                    } catch (exception: InterruptedException) {
+                        //TO DO//
+                    }
+                }
+            } catch (exception: ExecutionException) {
+                //TO DO//
+            } catch (exception: InterruptedException) {
+                //TO DO//
             }
         }
     }

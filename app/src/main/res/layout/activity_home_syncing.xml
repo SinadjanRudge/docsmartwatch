@@ -9,55 +9,22 @@
     android:contentDescription="scroll"
     android:fillViewport="true"
     android:padding="50dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/talkClick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Talk to the handheld"/>
 
-    <Button
-        android:id="@+id/send_message"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Send Message" />
-
-<!--    <ScrollView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:overScrollMode="never"-->
-<!--        android:scrollbars="vertical">-->
-
-<!--        <LinearLayout-->
-<!--            android:id="@+id/linearLayout2"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:background="#000000"-->
-<!--            android:orientation="vertical">-->
-
-<!--            <Button-->
-<!--                android:id="@+id/findPhoneBtn"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Find Phone" />-->
-
-<!--            <Button-->
-<!--                android:id="@+id/stopBtn"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Stop"-->
-<!--                android:visibility="gone" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/textView2"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Find Phone"-->
-<!--                android:textColor="#FFFFFF" />-->
-<!--        </LinearLayout>-->
-<!--    </ScrollView>-->
-
-    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:background="#000000"-->
-    <!--        android:id="@+id/Constraintlayout1"-->
-    <!--        tools:context=".Home_Appointment">-->
-
-    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+        <TextView
+            android:id="@+id/textLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Messages:"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
 </RelativeLayout>
