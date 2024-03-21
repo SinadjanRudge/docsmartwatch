@@ -1,7 +1,6 @@
-package com.example.myapplication
+package com.triadss.doctrack2
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -9,26 +8,18 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.health.services.client.ExerciseClient
 import androidx.health.services.client.ExerciseUpdateCallback
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.MeasureCallback
 import androidx.health.services.client.MeasureClient
-import androidx.health.services.client.PassiveMonitoringClient
 import androidx.health.services.client.data.Availability
 import androidx.health.services.client.data.DataPointContainer
 import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.DataTypeAvailability
 import androidx.health.services.client.data.DeltaDataType
-import androidx.health.services.client.data.ExerciseCapabilities
-import androidx.health.services.client.data.ExerciseLapSummary
-import androidx.health.services.client.data.ExerciseUpdate
-import androidx.health.services.client.data.LocationAvailability
-import androidx.health.services.client.data.MeasureCapabilities
-import androidx.health.services.client.data.PassiveMonitoringCapabilities
 import androidx.health.services.client.getCapabilities
+import com.triadss.doctrack2.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,7 +60,7 @@ class Home_VitalMonitor : AppCompatActivity() {
 
     private fun initHeartRate(measureClient: MeasureClient)
     {
-        supportsHeartRate(measureClient, object:  EitherCallback {
+        supportsHeartRate(measureClient, object: EitherCallback {
             override fun onTrue() {
                 // Handle successful result
                 loadingText.visibility = View.GONE

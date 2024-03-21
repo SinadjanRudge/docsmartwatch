@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature android:name="android.hardware.type.watch" />
@@ -19,22 +23,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
+
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />
 
 
         <activity
-            android:name=".Home_Medication"
+            android:name="com.triadss.doctrack2.Home_Medication"
             android:exported="false" />
         <activity
-            android:name=".Home_VitalMonitor"
+            android:name="com.triadss.doctrack2.Home_VitalMonitor"
             android:exported="false" />
         <activity
-            android:name=".Home_Appointment"
+            android:name="com.triadss.doctrack2.Home_Syncing"
             android:exported="false" />
         <activity
-            android:name=".Home_Selection"
+            android:name="com.triadss.doctrack2.Home_Selection"
             android:exported="false" /> <!-- <activity -->
         <!-- android:name=".HomePageActivity" -->
         <!-- android:exported="true"> -->
@@ -44,7 +49,7 @@
         <!-- </intent-filter> -->
         <!-- </activity> -->
         <activity
-            android:name=".DoctorChecker"
+            android:name="com.triadss.doctrack2.DoctorChecker"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +57,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <service android:name="com.triadss.doctrack2.bluetooth.MessageService"
+            android:exported="true">
+<!--            Add the gms.wearable.MESSAGE_RECEIVED intent filter//-->
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+<!--                Specify your path, and a host for the filter. Again, I’m using a wildcard//-->
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/my_path" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

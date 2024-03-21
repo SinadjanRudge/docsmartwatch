@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Home_Selection">
+    tools:context="com.triadss.doctrack2.Home_Selection">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -15,6 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.604"
         tools:context=".HomePageActivity">
 
         <ScrollView
@@ -30,25 +31,20 @@
                 android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/btn_appointment"
+                    android:id="@+id/btn_syncing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Appointment" />
+                    android:text="Syncing" />
 
                 <Button
                     android:id="@+id/vitalMonitor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Vital Monitor" />
-
-                <Button
-                    android:id="@+id/medication"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Medication" />
 
                 <Button
                     android:id="@+id/btn_close"
