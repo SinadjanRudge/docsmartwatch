@@ -27,7 +27,6 @@ class Home_Syncing : AppCompatActivity() {
     private lateinit var textLog: TextView
     private lateinit var activity: Activity
 
-    private var phoneNodeId: String? = null // Initialize as nullable
     private var sentMessageNumber = 1;
     private var receivedMessageNumber = 1;
 
