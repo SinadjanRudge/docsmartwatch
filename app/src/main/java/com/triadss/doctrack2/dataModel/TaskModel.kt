@@ -1,4 +1,4 @@
-package com.example.myapplication.dataModel
+package com.triadss.doctrack2.dataModel
 
 import com.google.type.DateTime
 

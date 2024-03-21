@@ -1,12 +1,16 @@
-package com.example.myapplication.bluetooth
+package com.triadss.doctrack2.bluetooth
 
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.myapplication.constants.BluetoothConstants
+import com.triadss.doctrack2.constants.BluetoothConstants
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 
 class MessageService : WearableListenerService() {
+
+    override fun onCreate() {
+        super.onCreate() // <-- don't forget this
+    }
     override fun onMessageReceived(messageEvent: MessageEvent) {
         //If the message’s path equals "/my_path"...//
         if (messageEvent.getPath().equals(BluetoothConstants.DataPath)) {

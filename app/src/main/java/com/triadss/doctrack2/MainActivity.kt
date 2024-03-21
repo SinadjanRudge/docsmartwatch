@@ -1,12 +1,11 @@
-package com.example.myapplication
+package com.triadss.doctrack2
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
-import java.util.Random
+import com.triadss.doctrack2.R
 
 
 public class DoctorChecker : AppCompatActivity() {

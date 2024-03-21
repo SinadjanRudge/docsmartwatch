@@ -5,6 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context=".Home_Medication">
+    tools:context="com.triadss.doctrack2.Home_Medication">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

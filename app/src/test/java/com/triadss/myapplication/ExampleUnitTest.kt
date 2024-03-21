@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.triadss.myapplication
 
 import org.junit.Test
 

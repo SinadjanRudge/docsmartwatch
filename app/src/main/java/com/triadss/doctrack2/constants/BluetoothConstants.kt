@@ -1,4 +1,4 @@
-package com.example.myapplication.constants
+package com.triadss.doctrack2.constants
 
 object BluetoothConstants {
     const val DataPath = "/my_path"

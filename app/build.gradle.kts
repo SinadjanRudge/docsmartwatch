@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myapplication"
+    namespace = "com.triadss.doctrack2"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.triadss.doctrack2"
         minSdk = 30
         targetSdk = 34
         versionCode = 1

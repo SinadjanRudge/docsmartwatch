@@ -30,16 +30,16 @@
 
 
         <activity
-            android:name=".Home_Medication"
+            android:name="com.triadss.doctrack2.Home_Medication"
             android:exported="false" />
         <activity
-            android:name=".Home_VitalMonitor"
+            android:name="com.triadss.doctrack2.Home_VitalMonitor"
             android:exported="false" />
         <activity
-            android:name=".Home_Syncing"
+            android:name="com.triadss.doctrack2.Home_Syncing"
             android:exported="false" />
         <activity
-            android:name=".Home_Selection"
+            android:name="com.triadss.doctrack2.Home_Selection"
             android:exported="false" /> <!-- <activity -->
         <!-- android:name=".HomePageActivity" -->
         <!-- android:exported="true"> -->
@@ -49,7 +49,7 @@
         <!-- </intent-filter> -->
         <!-- </activity> -->
         <activity
-            android:name=".DoctorChecker"
+            android:name="com.triadss.doctrack2.DoctorChecker"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,7 +58,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.example.myapplication.bluetooth.MessageService"
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <service android:name="com.triadss.doctrack2.bluetooth.MessageService"
             android:exported="true">
 <!--            Add the gms.wearable.MESSAGE_RECEIVED intent filter//-->
             <intent-filter>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context=".Home_VitalMonitor">
+    tools:context="com.triadss.doctrack2.Home_VitalMonitor">
 
     <!--        app:layout_constraintLeft_toRightOf="@+id/heartRateLabel"--><![CDATA[
          />
