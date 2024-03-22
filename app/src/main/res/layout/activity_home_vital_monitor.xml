@@ -109,6 +109,7 @@
                             android:textColor="#E4E3E3" />
 
                         <TextView
+                            android:id="@+id/bpVal"
                             android:gravity="right"
                             android:padding="3dip"
                             android:text="0/0"
@@ -129,6 +130,7 @@
                             android:textColor="#E4E3E3" />
 
                         <TextView
+                            android:id="@+id/tempVal"
                             android:gravity="right"
                             android:padding="3dip"
                             android:text="0"
@@ -149,6 +151,7 @@
                             android:textColor="#E4E3E3" />
 
                         <TextView
+                            android:id="@+id/pRateVal"
                             android:gravity="right"
                             android:padding="3dip"
                             android:text="0"
@@ -169,6 +172,7 @@
                             android:textColor="#E4E3E3" />
 
                         <TextView
+                            android:id="@+id/oxygenVal"
                             android:gravity="right"
                             android:padding="3dip"
                             android:text="0"
@@ -189,6 +193,7 @@
                             android:textColor="#E4E3E3" />
 
                         <TextView
+                            android:id="@+id/weightVal"
                             android:gravity="right"
                             android:padding="3dip"
                             android:text="0"
@@ -209,6 +214,7 @@
                             android:textColor="#E4E3E3" />
 
                         <TextView
+                            android:id="@+id/heightVal"
                             android:gravity="right"
                             android:padding="3dip"
                             android:text="0"
@@ -229,6 +235,7 @@
                             android:textColor="#EDEDED" />
 
                         <TextView
+                            android:id="@+id/bmiVal"
                             android:gravity="right"
                             android:padding="3dip"
                             android:text="0"
