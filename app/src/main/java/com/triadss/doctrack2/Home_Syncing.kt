@@ -13,7 +13,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.triadss.doctrack2.R
 import com.triadss.doctrack2.constants.BluetoothConstants
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -27,7 +26,6 @@ class Home_Syncing : AppCompatActivity() {
     private lateinit var textLog: TextView
     private lateinit var activity: Activity
 
-    private var phoneNodeId: String? = null // Initialize as nullable
     private var sentMessageNumber = 1;
     private var receivedMessageNumber = 1;
 
@@ -79,7 +77,7 @@ class Home_Syncing : AppCompatActivity() {
             //Display the following when a new message is received//
             val onMessageReceived =
                 "\nI just received a message from the handheld: " + receivedMessageNumber++ +
-                "\n" + intent?.getStringExtra(BluetoothConstants.MessageKey);
+                        "\n" + intent?.getStringExtra(BluetoothConstants.MessageKey);
             textLog.append(onMessageReceived)
         }
     }
@@ -136,3 +134,4 @@ class Home_Syncing : AppCompatActivity() {
     }
 
 }
+
