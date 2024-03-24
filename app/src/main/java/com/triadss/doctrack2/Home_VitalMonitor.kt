@@ -63,9 +63,7 @@ class Home_VitalMonitor : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_vital_monitor)
 
-//        val exit: Button = findViewById(R.id.exitBtn)
-        loadingText = findViewById(R.id.loadingText)
-        unavailabileHeartRate = findViewById(R.id.unavailabileHeartRateText)
+        unavailabileHeartRate = findViewById(R.id.unavailableHeartRateText)
         vitalsContainer = findViewById(R.id.vitalsContainer)
         heartRateText = findViewById(R.id.heartRateValue)
         bloodPressureVal = findViewById(R.id.bpVal)
@@ -90,21 +88,7 @@ class Home_VitalMonitor : AppCompatActivity() {
             // Permissions are already granted, proceed with your code
             initHeartRate()
         }
-
-        //Register to receive local broadcasts, which we'll be creating in the next step//
-//        val newFilter = IntentFilter(Intent.ACTION_SEND)
-//        val messageReceiver = Receiver()
-
     }
-//    inner class Receiver : BroadcastReceiver() {
-//        override fun onReceive(context: Context?, intent: Intent?) {
-//            //Display the following when a new message is received//
-//            val onMessageReceived =
-//                "\nI just received a message from the handheld: " + receivedMessageNumber++ +
-//                        "\n" + intent?.getStringExtra(BluetoothConstants.MessageKey);
-//            textLog.append(onMessageReceived)
-//        }
-//    }
 
     private val dataListener = DataClient.OnDataChangedListener { dataEventBuffer ->
         for (event in dataEventBuffer) {
@@ -180,8 +164,7 @@ class Home_VitalMonitor : AppCompatActivity() {
     private fun updateHeartRateValue(newHeartRate: Any) {
         runOnUiThread {
             // Update the TextView displaying the heart rate value
-            heartRateText.text = newHeartRate.toString()
-//            Log.e(TAG, "Heart rate value updated: $newHeartRate BPM")
+            heartRateText.text = "Heart Rate: \n" + newHeartRate.toString() + "  bpm"
         }
     }
 
@@ -246,8 +229,9 @@ class Home_VitalMonitor : AppCompatActivity() {
 
         supportsHeartRate(measureClient, object : EitherCallback {
             override fun onTrue() {
-                loadingText.visibility = View.GONE
+//                loadingText.visibility = View.GONE
                 vitalsContainer.visibility = View.VISIBLE
+
                 initMeasureClientCallbacks(measureClient)
             }
 
@@ -296,7 +280,6 @@ class Home_VitalMonitor : AppCompatActivity() {
             heartRateCallback
         )
     }
-
 
     private fun supportsHeartRate(measureClient: MeasureClient, eitherCallback: EitherCallback) {
         CoroutineScope(Dispatchers.IO).launch {
