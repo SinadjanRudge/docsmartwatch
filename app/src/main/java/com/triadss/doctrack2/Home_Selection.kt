@@ -13,18 +13,12 @@ class Home_Selection : AppCompatActivity() {
         setContentView(R.layout.activity_home_selection)
 
         val close = findViewById(R.id.btn_close) as Button
-        val syncing = findViewById(R.id.btn_syncing) as Button
+
         val vitalMonitor = findViewById(R.id.vitalMonitor) as Button
 
         close.setOnClickListener {                                                      //Close App
             finishAffinity()
         }
-        syncing.setOnClickListener {                                                //Appointment
-            syncing.setOnClickListener {
-                Syncing()
-            }
-        }
-
         vitalMonitor.setOnClickListener {                                                //Appointment
             VitalMonitor()
         }
