@@ -1,15 +1,17 @@
 package com.triadss.doctrack2
 
 import VitalSignsModel
+import android.Manifest
+import android.app.Activity
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.health.services.client.ExerciseClient
@@ -23,25 +25,24 @@ import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.DataTypeAvailability
 import androidx.health.services.client.data.DeltaDataType
 import androidx.health.services.client.getCapabilities
-import com.triadss.doctrack2.R
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.wearable.DataClient
+import com.google.android.gms.wearable.DataEvent
+import com.google.android.gms.wearable.DataMapItem
+import com.google.android.gms.wearable.Node
+import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.IntentFilter
-import com.google.android.gms.wearable.DataClient
-import com.google.android.gms.wearable.DataEvent
-import com.google.android.gms.wearable.DataMapItem
-import com.google.android.gms.wearable.Wearable
-import com.triadss.doctrack2.constants.BluetoothConstants
 import org.json.JSONException
 import org.json.JSONObject
 
 
-class Home_VitalMonitor : AppCompatActivity() {
+class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks {
+    private lateinit var mGoogleApiClient: GoogleApiClient
     private val TAG = "VitalMonitor"
     private val PERMISSION_REQUEST_CODE = 1001
     private lateinit var exerciseClient: ExerciseClient
@@ -58,10 +59,20 @@ class Home_VitalMonitor : AppCompatActivity() {
     private lateinit var bmiVal: TextView
     private lateinit var vitalsContainer: LinearLayout
     private lateinit var vitalSigns: VitalSignsModel
+    private val isConnectedToWearable = false
+    private lateinit var activity: Activity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_vital_monitor)
+
+        activity = this
+
+        // Initialize mGoogleApiClient
+        mGoogleApiClient = GoogleApiClient.Builder(this)
+            .addApi(Wearable.API)
+            .addConnectionCallbacks(this)
+            .build()
 
         unavailabileHeartRate = findViewById(R.id.unavailableHeartRateText)
         vitalsContainer = findViewById(R.id.vitalsContainer)
@@ -78,17 +89,47 @@ class Home_VitalMonitor : AppCompatActivity() {
         val measureClient = healthClient.measureClient;
         exerciseClient = healthClient.exerciseClient
 
-        initHeartRate()
-
-        // Check if the required permissions are granted
+        //  Check if the required permissions are granted
         if (!hasPermissions()) {
             // Request permissions if not granted
             requestPermissions()
-        } else {
-            // Permissions are already granted, proceed with your code
-            initHeartRate()
+        }
+
+        // Permissions are already granted, proceed with your code
+        initHeartRate()
+
+        // Use coroutines to perform the blocking operation on a background thread
+        CoroutineScope(Dispatchers.Main).launch {
+            val nodeListTask: Task<List<Node>> = Wearable.getNodeClient(activity).getConnectedNodes()
+            val nodes: List<Node> = withContext(Dispatchers.IO) {
+                Tasks.await(nodeListTask)
+            }
+
+            Log.e("Hello world", "" + nodes.size)
         }
     }
+
+    private fun getNodes(): Collection<String> {
+        val results = HashSet<String>()
+        CoroutineScope(Dispatchers.IO).launch {
+            // Perform the asynchronous operation in the background thread
+            try {
+                val nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await()
+                for (node in nodes.nodes) {
+                    results.add(node.id)
+                }
+                withContext(Dispatchers.Main) {
+                    // Update UI or perform any UI-related tasks here
+                    Log.e("VitalMonitor", "Node Size: " + nodes.nodes.size)
+                }
+            } catch (e: Exception) {
+                Log.e("VitalMonitor", "Error fetching nodes: ${e.message}")
+            }
+        }
+
+        return results
+    }
+
 
     private val dataListener = DataClient.OnDataChangedListener { dataEventBuffer ->
         for (event in dataEventBuffer) {
@@ -129,18 +170,6 @@ class Home_VitalMonitor : AppCompatActivity() {
                     weightVal.text = weight.toString()
                     heightVal.text = height.toString()
                     bmiVal.text = bmi.toString()
-
-                    // Log the extracted values
-                    Log.d(TAG, "VitalsId: $vitalsId")
-                    Log.d(TAG, "PatientId: $patientId")
-                    Log.d(TAG, "BloodPressure: $bloodPressure")
-                    Log.d(TAG, "Temperature: $temperature")
-                    Log.d(TAG, "PulseRate: $pulseRate")
-                    Log.d(TAG, "OxygenLevel: $oxygenLevel")
-                    Log.d(TAG, "Weight: $weight")
-                    Log.d(TAG, "Height: $height")
-                    Log.d(TAG, "BMI: $bmi")
-                    Log.d(TAG, "Uid: $uid")
                 } catch (e: JSONException) {
                     Log.e(TAG, "Error parsing JSON data: " + e.message)
                 }
@@ -229,15 +258,11 @@ class Home_VitalMonitor : AppCompatActivity() {
 
         supportsHeartRate(measureClient, object : EitherCallback {
             override fun onTrue() {
-//                loadingText.visibility = View.GONE
-                vitalsContainer.visibility = View.VISIBLE
-
                 initMeasureClientCallbacks(measureClient)
             }
 
             override fun onFalse() {
                 loadingText.visibility = View.GONE
-                unavailabileHeartRate.visibility = View.VISIBLE
             }
         })
     }
@@ -303,5 +328,14 @@ class Home_VitalMonitor : AppCompatActivity() {
             Log.e("ADAMX", "$this $message")
         }
     }
+
+    override fun onConnected(p0: Bundle?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onConnectionSuspended(p0: Int) {
+        TODO("Not yet implemented")
+    }
+
 }
 

@@ -33,7 +33,7 @@
                     android:text="Loading"
                     android:textAlignment="center"
                     android:textColor="#D1D1D1"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
 
                     android:padding="10dp" />
 
@@ -41,17 +41,29 @@
                     android:id="@+id/unavailableHeartRateText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Unavailable"
+                    android:text="Unavailable Vital Signs"
                     android:textAlignment="center"
                     android:textColor="#D1D1D1"
-                    android:textSize="18sp"
-                    android:visibility="gone"
-                    android:padding="10dp" />
+                    android:textSize="15sp"
+                    android:padding="10dp"
+                    />
+
+<!--                <TextView-->
+<!--                    android:id="@+id/pairMobileDevice"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Please Pair it with Mobile Device"-->
+<!--                    android:textAlignment="center"-->
+<!--                    android:textColor="#D1D1D1"-->
+<!--                    android:textSize="18sp"-->
+<!--                    android:padding="10dp" />-->
+
 
                 <LinearLayout
                     android:id="@+id/vitalsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:orientation="vertical">
 
                     <TableLayout
