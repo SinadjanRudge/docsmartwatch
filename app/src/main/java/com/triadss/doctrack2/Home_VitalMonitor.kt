@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -42,14 +43,13 @@ import org.json.JSONObject
 
 
 class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks {
-    private lateinit var mGoogleApiClient: GoogleApiClient
     private val TAG = "VitalMonitor"
     private val PERMISSION_REQUEST_CODE = 1001
     private lateinit var exerciseClient: ExerciseClient
     private lateinit var exerciseCallback: ExerciseUpdateCallback
     private lateinit var loadingText: TextView
     private lateinit var heartRateText: TextView
-    private lateinit var unavailabileHeartRate: TextView
+    private lateinit var unavailableVitalsText: TextView
     private lateinit var bloodPressureVal: TextView
     private lateinit var pulseRateVal: TextView
     private lateinit var temperatureVal: TextView
@@ -59,7 +59,6 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
     private lateinit var bmiVal: TextView
     private lateinit var vitalsContainer: LinearLayout
     private lateinit var vitalSigns: VitalSignsModel
-    private val isConnectedToWearable = false
     private lateinit var activity: Activity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,13 +67,7 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
 
         activity = this
 
-        // Initialize mGoogleApiClient
-        mGoogleApiClient = GoogleApiClient.Builder(this)
-            .addApi(Wearable.API)
-            .addConnectionCallbacks(this)
-            .build()
-
-        unavailabileHeartRate = findViewById(R.id.unavailableHeartRateText)
+        unavailableVitalsText = findViewById(R.id.unavailableVitalsText)
         vitalsContainer = findViewById(R.id.vitalsContainer)
         heartRateText = findViewById(R.id.heartRateValue)
         bloodPressureVal = findViewById(R.id.bpVal)
@@ -95,39 +88,28 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
             requestPermissions()
         }
 
-        // Permissions are already granted, proceed with your code
         initHeartRate()
 
-        // Use coroutines to perform the blocking operation on a background thread
+        checkIfPairedDevice()
+    }
+
+    private fun checkIfPairedDevice() {
         CoroutineScope(Dispatchers.Main).launch {
             val nodeListTask: Task<List<Node>> = Wearable.getNodeClient(activity).getConnectedNodes()
             val nodes: List<Node> = withContext(Dispatchers.IO) {
                 Tasks.await(nodeListTask)
             }
 
-            Log.e("Hello world", "" + nodes.size)
-        }
-    }
-
-    private fun getNodes(): Collection<String> {
-        val results = HashSet<String>()
-        CoroutineScope(Dispatchers.IO).launch {
-            // Perform the asynchronous operation in the background thread
-            try {
-                val nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await()
-                for (node in nodes.nodes) {
-                    results.add(node.id)
-                }
-                withContext(Dispatchers.Main) {
-                    // Update UI or perform any UI-related tasks here
-                    Log.e("VitalMonitor", "Node Size: " + nodes.nodes.size)
-                }
-            } catch (e: Exception) {
-                Log.e("VitalMonitor", "Error fetching nodes: ${e.message}")
+            if (nodes.size == 1) {
+                vitalsContainer.visibility = View.VISIBLE
+                unavailableVitalsText.visibility = View.GONE
+                Toast.makeText(activity, "Paired with a mobile phone", Toast.LENGTH_SHORT).show()
+            } else {
+                vitalsContainer.visibility = View.GONE
+                unavailableVitalsText.visibility = View.VISIBLE
+                Toast.makeText(activity, "Please pair a device with the smartwatch", Toast.LENGTH_SHORT).show()
             }
         }
-
-        return results
     }
 
 
@@ -138,9 +120,7 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
                 val jsonData = dataMap.getString("jsonData")
                 Log.d(TAG, "Received JSON data: $jsonData")
 
-                // Log the values from the JSON data
                 try {
-                    // Assuming your JSON structure matches the VitalSignsDto fields
                     val jsonObject = JSONObject(jsonData)
                     val vitalsId = jsonObject.getInt("vitalsId")
                     val patientId = jsonObject.getString("patientId")
@@ -282,7 +262,6 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
                     // Assuming the heart rate data is in BPM (beats per minute)
                     val heartRateValue = data.sampleDataPoints[0].value
                     updateHeartRateValue(heartRateValue) // Update UI with the new heart rate value
-//                    Log.e(TAG, "Heart rate data received: $heartRateValue BPM")
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
