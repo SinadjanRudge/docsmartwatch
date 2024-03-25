@@ -2,9 +2,8 @@ package com.triadss.doctrack2
 
 import VitalSignsModel
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -23,10 +22,8 @@ import androidx.health.services.client.MeasureClient
 import androidx.health.services.client.data.Availability
 import androidx.health.services.client.data.DataPointContainer
 import androidx.health.services.client.data.DataType
-import androidx.health.services.client.data.DataTypeAvailability
 import androidx.health.services.client.data.DeltaDataType
 import androidx.health.services.client.getCapabilities
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.DataClient
@@ -36,13 +33,14 @@ import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 
-
-class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks {
+class Home_VitalMonitor : AppCompatActivity() {
+    private val CHECK_INTERVAL_MILLISECONDS: Long = 3000
     private val TAG = "VitalMonitor"
     private val PERMISSION_REQUEST_CODE = 1001
     private lateinit var exerciseClient: ExerciseClient
@@ -60,58 +58,7 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
     private lateinit var vitalsContainer: LinearLayout
     private lateinit var vitalSigns: VitalSignsModel
     private lateinit var activity: Activity
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_vital_monitor)
-
-        activity = this
-
-        unavailableVitalsText = findViewById(R.id.unavailableVitalsText)
-        vitalsContainer = findViewById(R.id.vitalsContainer)
-        heartRateText = findViewById(R.id.heartRateValue)
-        bloodPressureVal = findViewById(R.id.bpVal)
-        temperatureVal = findViewById(R.id.tempVal)
-        oxygenLevelVal = findViewById(R.id.oxygenVal)
-        weightVal = findViewById(R.id.weightVal)
-        heightVal = findViewById(R.id.heightVal)
-        bmiVal = findViewById(R.id.bmiVal)
-        pulseRateVal = findViewById(R.id.pRateVal)
-
-        val healthClient = HealthServices.getClient(this)
-        val measureClient = healthClient.measureClient;
-        exerciseClient = healthClient.exerciseClient
-
-        //  Check if the required permissions are granted
-        if (!hasPermissions()) {
-            // Request permissions if not granted
-            requestPermissions()
-        }
-
-        initHeartRate()
-
-        checkIfPairedDevice()
-    }
-
-    private fun checkIfPairedDevice() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val nodeListTask: Task<List<Node>> = Wearable.getNodeClient(activity).getConnectedNodes()
-            val nodes: List<Node> = withContext(Dispatchers.IO) {
-                Tasks.await(nodeListTask)
-            }
-
-            if (nodes.size == 1) {
-                vitalsContainer.visibility = View.VISIBLE
-                unavailableVitalsText.visibility = View.GONE
-                Toast.makeText(activity, "Paired with a mobile phone", Toast.LENGTH_SHORT).show()
-            } else {
-                vitalsContainer.visibility = View.GONE
-                unavailableVitalsText.visibility = View.VISIBLE
-                Toast.makeText(activity, "Please pair a device with the smartwatch", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
+    private var checkOnce = false;
 
     private val dataListener = DataClient.OnDataChangedListener { dataEventBuffer ->
         for (event in dataEventBuffer) {
@@ -157,79 +104,83 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Register a listener to receive data events when the activity is resumed
-        Wearable.getDataClient(this).addListener(dataListener)
-    }
 
-    override fun onPause() {
-        super.onPause()
-        // Unregister the data listener to avoid memory leaks when the activity is paused
-        Wearable.getDataClient(this).removeListener(dataListener)
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_home_vital_monitor)
 
+        activity = this
 
-    private fun updateHeartRateValue(newHeartRate: Any) {
-        runOnUiThread {
-            // Update the TextView displaying the heart rate value
-            heartRateText.text = "Heart Rate: \n" + newHeartRate.toString() + "  bpm"
+        // Initialize views
+        initViews()
+
+        val healthClient = HealthServices.getClient(this)
+        val measureClient = healthClient.measureClient
+        exerciseClient = healthClient.exerciseClient
+
+        // Check and request permissions if needed
+        if (!hasPermissions()) {
+            requestPermissions()
         }
+
+        initHeartRate()
+        startContinuousCheck()
     }
 
-
-    private fun hasPermissions(): Boolean {
-        // Check if Bluetooth permissions are granted
-        val bluetoothPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.BLUETOOTH
-        )
-        val bluetoothAdminPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.BLUETOOTH_ADMIN
-        )
-        val bluetoothConnectPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.BLUETOOTH_CONNECT
-        )
-        return bluetoothPermission == PackageManager.PERMISSION_GRANTED &&
-                bluetoothAdminPermission == PackageManager.PERMISSION_GRANTED &&
-                bluetoothConnectPermission == PackageManager.PERMISSION_GRANTED
+    private fun initViews() {
+        unavailableVitalsText = findViewById(R.id.unavailableVitalsText)
+        vitalsContainer = findViewById(R.id.vitalsContainer)
+        heartRateText = findViewById(R.id.heartRateValue)
+        bloodPressureVal = findViewById(R.id.bpVal)
+        temperatureVal = findViewById(R.id.tempVal)
+        oxygenLevelVal = findViewById(R.id.oxygenVal)
+        weightVal = findViewById(R.id.weightVal)
+        heightVal = findViewById(R.id.heightVal)
+        bmiVal = findViewById(R.id.bmiVal)
+        pulseRateVal = findViewById(R.id.pRateVal)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            // Check if all permissions are granted after user's response
-            if (grantResults.isNotEmpty() &&
-                grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-            ) {
-                // All permissions granted, proceed with your code
-                initHeartRate()
-            } else {
-                // Permissions not granted, handle accordingly (e.g., show a message or exit the app)
-                // You can also request permissions again or take appropriate action based on the user's response
+    private fun startContinuousCheck() {
+        CoroutineScope(Dispatchers.Main).launch {
+            while (true) {
+                checkIfPairedDevice()
+                delay(CHECK_INTERVAL_MILLISECONDS)
             }
         }
     }
 
-    private fun requestPermissions() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BODY_SENSORS
-            ),
-            PERMISSION_REQUEST_CODE
-        )
+    private fun checkIfPairedDevice() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val nodeListTask: Task<List<Node>> = Wearable.getNodeClient(activity).getConnectedNodes()
+            val nodes: List<Node> = withContext(Dispatchers.IO) {
+                Tasks.await(nodeListTask)
+            }
+
+            if (nodes.size == 1) {
+                showPairedDeviceStatus(true)
+            } else {
+                showPairedDeviceStatus(false)
+            }
+        }
     }
 
+    private fun showPairedDeviceStatus(isPaired: Boolean) {
+        if (isPaired) {
+            vitalsContainer.visibility = View.VISIBLE
+            unavailableVitalsText.visibility = View.GONE
+            if (!checkOnce) {
+                Toast.makeText(activity, "Paired with a mobile phone", Toast.LENGTH_SHORT).show()
+            }
+            checkOnce = true
+        } else {
+            vitalsContainer.visibility = View.GONE
+            unavailableVitalsText.visibility = View.VISIBLE
+            if (checkOnce) {
+                Toast.makeText(activity, "Please pair a device with the smartwatch", Toast.LENGTH_SHORT).show()
+                checkOnce = false
+            }
+        }
+    }
 
     private fun initHeartRate() {
         val healthClient = HealthServices.getClient(this)
@@ -247,40 +198,34 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
         })
     }
 
-
     private fun initMeasureClientCallbacks(measureClient: MeasureClient) {
         val heartRateCallback = object : MeasureCallback {
             override fun onAvailabilityChanged(dataType: DeltaDataType<*, *>, availability: Availability) {
-                if (availability is DataTypeAvailability) {
-                    "Heart rate availability changed: $availability".log()
-                }
-                "Heart rate availability changed: $availability".log()
+                Log.d(TAG, "Heart rate availability changed: $availability")
             }
 
             override fun onDataReceived(data: DataPointContainer) {
                 try {
-                    // Assuming the heart rate data is in BPM (beats per minute)
                     val heartRateValue = data.sampleDataPoints[0].value
-                    updateHeartRateValue(heartRateValue) // Update UI with the new heart rate value
+                    updateHeartRateValue(heartRateValue)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e(TAG, "Error receiving heart rate data: ${e.message}")
                 }
             }
 
             override fun onRegistered() {
                 super.onRegistered()
-                "onRegistered Success".log()
+                Log.d(TAG, "Measure client registered")
             }
 
             override fun onRegistrationFailed(throwable: Throwable) {
                 super.onRegistrationFailed(throwable)
-                throwable.printStackTrace()
-                "onRegistrationFailed ${throwable.localizedMessage}".log()
+                Log.e(TAG, "Measure client registration failed: ${throwable.message}")
             }
         }
 
         measureClient.registerMeasureCallback(
-            DataType.Companion.HEART_RATE_BPM,
+            DataType.HEART_RATE_BPM,
             heartRateCallback
         )
     }
@@ -297,24 +242,84 @@ class Home_VitalMonitor : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
         }
     }
 
+
+    private fun updateHeartRateValue(newHeartRate: Any) {
+        runOnUiThread {
+            heartRateText.text = "Heart Rate: \n$newHeartRate bpm"
+        }
+    }
+
+    private fun hasPermissions(): Boolean {
+        val bluetoothPermission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.BLUETOOTH
+        )
+        val bluetoothAdminPermission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.BLUETOOTH_ADMIN
+        )
+        val bluetoothConnectPermission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.BLUETOOTH_CONNECT
+        )
+        return bluetoothPermission == PackageManager.PERMISSION_GRANTED &&
+                bluetoothAdminPermission == PackageManager.PERMISSION_GRANTED &&
+                bluetoothConnectPermission == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BODY_SENSORS
+            ),
+            PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() &&
+                grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+            ) {
+                Toast.makeText(activity, "All permissions granted", Toast.LENGTH_SHORT).show()
+                initHeartRate()
+            } else {
+                // Permissions not granted, handle accordingly
+//                Toast.makeText(activity, "All permissions not granted", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Register a listener to receive data events when the activity is resumed
+        Wearable.getDataClient(this).addListener(dataListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Unregister the data listener to avoid memory leaks when the activity is paused
+        Wearable.getDataClient(this).removeListener(dataListener)
+    }
+
     interface EitherCallback {
         fun onTrue()
         fun onFalse()
     }
+
 
     companion object {
         fun Any.log(message: String = "") {
             Log.e("ADAMX", "$this $message")
         }
     }
-
-    override fun onConnected(p0: Bundle?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onConnectionSuspended(p0: Int) {
-        TODO("Not yet implemented")
-    }
-
 }
-
