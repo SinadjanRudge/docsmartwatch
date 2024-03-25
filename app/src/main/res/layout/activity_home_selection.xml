@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context="com.triadss.doctrack2.Home_Selection">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="191dp"
         android:layout_height="218dp"
-        android:background="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,12 +35,6 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/btn_syncing"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Syncing" />
-
-                <Button
                     android:id="@+id/vitalMonitor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -50,7 +44,7 @@
                     android:id="@+id/btn_close"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Close" />
+                    android:text="Exit" />
 
             </LinearLayout>
         </ScrollView>
