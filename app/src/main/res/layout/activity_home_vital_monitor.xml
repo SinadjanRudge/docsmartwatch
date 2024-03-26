@@ -215,7 +215,14 @@
 
 
                     </TableLayout>
-
+                    <TextView
+                        android:id="@+id/lastSyncText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Last Sync: "
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp"
+                        android:padding="10dp" />
                 </LinearLayout>
 
                 <Space
